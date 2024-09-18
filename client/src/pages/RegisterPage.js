@@ -24,6 +24,10 @@ const RegisterPage = () => {
 
     const handelUploadPhoto = (e) => {
         const file = e.target.files[0];
+
+        const uploadPhoto = await uploadFile(file);
+        
+        
         setUploadPhoto(file);
     };
 
