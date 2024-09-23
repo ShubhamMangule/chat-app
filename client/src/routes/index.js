@@ -4,7 +4,7 @@ import RegisterPage from '../pages/RegisterPage';
 import CheckEmailPage from '../pages/CheckEmailPage';
 import CheckPassPage from '../pages/CheckPassPage';
 import MessagePage from '../components/MessagePage';
-import Home from '../pages/home';
+import Home from '../pages/Home';
 import AuthLayouts from '../layout';
 import Forgotpassword from '../pages/Forgotpassword';
 

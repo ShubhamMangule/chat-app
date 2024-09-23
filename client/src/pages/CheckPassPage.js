@@ -3,6 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
+import { useDispatch } from 'react-redux';
 
 const CheckPassPage = () => {
     const [data, setData] = useState({
@@ -11,6 +12,8 @@ const CheckPassPage = () => {
 
     const navigate = useNavigate();
     const location = useLocation();
+    const dispatch = useDispatch();
+
     useEffect(() => {
         if (!location?.state?.name) {
             navigate('/email');
@@ -31,8 +34,6 @@ const CheckPassPage = () => {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log('location?.state?._id', location?.state?._id);
-
         const URL = `${process.env.REACT_APP_BACKEND_URL}/api/password`;
 
         try {
@@ -47,16 +48,19 @@ const CheckPassPage = () => {
             });
 
             toast.success(response.data?.message);
-            console.log('response.data?.success', response.data);
+            // console.log('response.data', response.data?.message);
 
             if (response.data?.success) {
+                // dispatch(response?.data?.token);
+                // localStorage.setItem('token', response?.data?.token);
+
                 setData({
                     password: '',
                 });
                 navigate('/');
             }
         } catch (error) {
-            toast.error(error.response.data?.message);
+            toast.error(error?.response?.data?.message);
         }
     };
 
