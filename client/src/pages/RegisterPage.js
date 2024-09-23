@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { IoCloseOutline } from 'react-icons/io5';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import uploadFile from '../helper/uploadFile';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const RegisterPage = () => {
     const [data, setData] = useState({
@@ -11,6 +14,7 @@ const RegisterPage = () => {
     });
 
     const [uploadPhoto, setUploadPhoto] = useState('');
+    const navigate = useNavigate();
 
     const handelChange = (e) => {
         const { name, value } = e.target;
@@ -22,13 +26,13 @@ const RegisterPage = () => {
         });
     };
 
-    const handelUploadPhoto = (e) => {
+    const handelUploadPhoto = async (e) => {
         const file = e.target.files[0];
-
         const uploadPhoto = await uploadFile(file);
-        
-        
         setUploadPhoto(file);
+        setData((pd) => {
+            return { ...pd, profile_pic: uploadPhoto?.url };
+        });
     };
 
     const handleClearUploadPhoto = (e) => {
@@ -37,15 +41,37 @@ const RegisterPage = () => {
         setUploadPhoto(null);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        console.log(data);
+
+        const URL = `${process.env.REACT_APP_BACKEND_URL}/api/register`;
+
+        try {
+            const response = await axios.post(URL, data);
+
+            toast.success(response.data?.message);
+            if (response.data?.success) {
+                setData({
+                    name: '',
+                    email: '',
+                    password: '',
+                    profile_pic: '',
+                });
+
+                console.log('Navigating to /email');
+                navigate('/email');
+                console.log('Navigating to /email', navigate);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error(error.response.data?.message);
+        }
     };
 
     return (
         <div children='mt-10'>
-            <div className='bg-white w-full max-w-sm rounded overflow-hidden px-4 mt-5 p-4 mx-auto'>
+            <div className='bg-white w-full max-w-md rounded overflow-hidden px-4 mt-5 p-4  mx-2 md:mx-auto'>
                 <h3 className='text-center font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-pink-500 to-red-400'>
                     Welcome to Chat App!
                 </h3>
@@ -117,7 +143,6 @@ const RegisterPage = () => {
                             name='profile_pic'
                             placeholder='Enter Your profile pic'
                             className='bg-slate-100 px-2 py-1 focus:outline-primary hidden'
-                            value={data?.profile_pic}
                             onChange={handelUploadPhoto}
                         />
                     </div>
@@ -130,7 +155,7 @@ const RegisterPage = () => {
                     Already Have Account ?
                     <Link
                         to={'/email'}
-                        className='hover:text-primary hover:underline hover:font-semibold'
+                        className='hover:text-primary hover:underline hover:font-semibold ml-1'
                     >
                         Login
                     </Link>

@@ -9,7 +9,7 @@ const updateUserDetails = require('../controller/updateUserDetails');
 const router = express.Router();
 
 // create user API
-router.get('/register', registerUser);
+router.post('/register', registerUser);
 
 // check user Email
 router.post('/email', checkEmail);
