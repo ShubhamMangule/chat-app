@@ -48,11 +48,10 @@ const CheckPassPage = () => {
             });
 
             toast.success(response.data?.message);
-            // console.log('response.data', response.data?.message);
 
             if (response.data?.success) {
-                // dispatch(response?.data?.token);
-                // localStorage.setItem('token', response?.data?.token);
+                dispatch(response?.data?.token);
+                localStorage.setItem('token', response?.data?.token);
 
                 setData({
                     password: '',
