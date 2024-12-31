@@ -22,9 +22,16 @@ export const userSlice = createSlice({
             state.token = action.payload;
         },
         logout: (state, action) => {
-            (state._id = '')((state.name = ''))((state.email = ''))(
-                (state.profile_pic = ''),
-            )((state.token = ''));
+            // (state._id = '')
+            // ((state.name = ''))
+            // ((state.email = ''))
+            // ((state.profile_pic = ''),)
+            // ((state.token = ''));
+            state._id = '';
+            state.name = '';
+            state.email = '';
+            state.profile_pic = '';
+            state.token = '';
         },
     },
 });

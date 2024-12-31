@@ -43,15 +43,16 @@ const CheckPassPage = () => {
                 url: URL,
                 data: {
                     userId: location?.state?._id,
-                    password: data.password,
+                    password: data?.password,
                 },
                 withCredentials: true,
             });
 
-            toast.success(response.data?.message);
+            toast.success(response?.data?.message);
 
             if (response.data?.success) {
                 dispatch(setToken(response?.data?.token));
+                localStorage.setItem('token', response?.data?.token);
 
                 setData({
                     password: '',
