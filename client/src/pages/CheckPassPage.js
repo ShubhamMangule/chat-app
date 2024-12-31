@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import Avatar from '../components/Avatar';
 import { useDispatch } from 'react-redux';
+import { setToken } from '../redux/userSlice';
 
 const CheckPassPage = () => {
     const [data, setData] = useState({
@@ -50,8 +51,7 @@ const CheckPassPage = () => {
             toast.success(response.data?.message);
 
             if (response.data?.success) {
-                dispatch(response?.data?.token);
-                localStorage.setItem('token', response?.data?.token);
+                dispatch(setToken(response?.data?.token));
 
                 setData({
                     password: '',

@@ -59,9 +59,7 @@ const RegisterPage = () => {
                     profile_pic: '',
                 });
 
-                console.log('Navigating to /email');
                 navigate('/email');
-                console.log('Navigating to /email', navigate);
             }
         } catch (error) {
             console.log(error);
