@@ -1,12 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Avatar from './Avatar';
 import uploadFile from '../helper/uploadFile';
+import Divider from './Divider';
+import toast from 'react-hot-toast';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/userSlice';
 
 const EditUserDetails = ({ userData, onClose }) => {
     const [data, setData] = useState({
         name: userData?.name,
         profile_pic: userData?.profile?._pic,
     });
+
+    const uploadPhotoRef = useRef();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         setData((pd) => {
@@ -33,9 +41,29 @@ const EditUserDetails = ({ userData, onClose }) => {
         });
     };
 
+    const handleOpenUploadPhoto = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        uploadPhotoRef.current.click();
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         e.stopPropagation();
+        try {
+            const URL = `${process.env.REACT_APP_BACKEND_URL}/api/update-user`;
+            const response = await axios.post(URL, data, {
+                withCredentials: true,
+            });
+            toast.success(response?.data?.message);
+
+            if (response?.data?.success) {
+                dispatch(setUser(response?.data?.data));
+                onClose();
+            }
+        } catch (error) {
+            toast.error(error?.response?.data?.message);
+        }
     };
     return (
         <div className='fixed top-0 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-40 flex items-center justify-center'>
@@ -60,7 +88,7 @@ const EditUserDetails = ({ userData, onClose }) => {
                         />
                     </div>
                     <div>
-                        <label htmlFor='profile_pic'>Photo</label>
+                        Photo:
                         <div className='my-1 flex items-center gap-4'>
                             <Avatar
                                 width={40}
@@ -68,21 +96,35 @@ const EditUserDetails = ({ userData, onClose }) => {
                                 imageUrl={data?.profile_pic}
                                 name={data?.name}
                             />
-                            <button className='font-semibold'>
-                                Change Photo
-                            </button>
-                            <input
-                                type='file'
-                                className='hidden'
-                                onChange={handelUploadPhoto}
-                            />
+                            <label htmlFor='profile_pic'>
+                                <button
+                                    className='font-semibold'
+                                    onClick={handleOpenUploadPhoto}
+                                >
+                                    Change Photo
+                                </button>
+                                <input
+                                    type='file'
+                                    className='hidden'
+                                    id='profile_pic'
+                                    onChange={handelUploadPhoto}
+                                    ref={uploadPhotoRef}
+                                />
+                            </label>
                         </div>
                     </div>
-                    <div className='flex gap-2 w-fit ml-auto mt-2'>
-                        <button className='border-primary border text-primary rounded px-4 py-1'>
+                    <Divider />
+                    <div className='flex gap-2 w-fit ml-auto'>
+                        <button
+                            onClick={onClose}
+                            className='border-primary border text-primary rounded px-4 py-1 hover:bg-primary hover:text-white'
+                        >
                             Cancel
                         </button>
-                        <button className='border-primary border text-primary rounded px-4 py-1'>
+                        <button
+                            onClick={handleSubmit}
+                            className='border-primary border bg-primary text-white rounded px-4 py-1 hover:bg-secondary'
+                        >
                             Save
                         </button>
                     </div>

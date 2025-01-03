@@ -3,6 +3,8 @@ const UserModel = require('../models/UserModel');
 
 async function updateUserDetails(req, res) {
     try {
+        console.log('data updated');
+
         const token = req.cookies.token || '';
         const user = await getUserDetailsFromToken(token);
 

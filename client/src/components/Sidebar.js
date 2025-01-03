@@ -10,7 +10,7 @@ import EditUserDetails from './EditUserDetails';
 
 function Sidebar() {
     const user = useSelector((state) => state?.user);
-    const [editUserOpen, setEditUserOpen] = useState(true);
+    const [editUserOpen, setEditUserOpen] = useState(false);
 
     return (
         <div className='w-full h-full'>
@@ -39,7 +39,12 @@ function Sidebar() {
                         title={user?.name}
                         onClick={() => setEditUserOpen(true)}
                     >
-                        <Avatar width={36} height={36} name={user?.name} />
+                        <Avatar
+                            width={36}
+                            height={36}
+                            name={user?.name}
+                            imageUrl={user?.profile_pic}
+                        />
                     </button>
                     <button
                         className='w-12 h-12 flex items-center justify-center hover:bg-gray-300 cursor-pointer rounded-md'
