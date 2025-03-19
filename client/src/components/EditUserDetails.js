@@ -66,7 +66,7 @@ const EditUserDetails = ({ userData, onClose }) => {
         }
     };
     return (
-        <div className='fixed top-0 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-40 flex items-center justify-center'>
+        <div className='fixed top-0 bottom-0 left-0 right-0 bg-gray-700 bg-opacity-40 flex items-center justify-center z-10'>
             <div className='bg-white p-4 py-5 m-1 rounded max-w-sm'>
                 <h2 className='font-bold'> Profile Details</h2>
                 <p className='text-sm'>Edit user details</p>
