@@ -6,6 +6,7 @@ const initialState = {
     email: '',
     profile_pic: '',
     token: '',
+    onlineUser: [],
 };
 
 export const userSlice = createSlice({
@@ -22,20 +23,18 @@ export const userSlice = createSlice({
             state.token = action.payload;
         },
         logout: (state, action) => {
-            // (state._id = '')
-            // ((state.name = ''))
-            // ((state.email = ''))
-            // ((state.profile_pic = ''),)
-            // ((state.token = ''));
             state._id = '';
             state.name = '';
             state.email = '';
             state.profile_pic = '';
             state.token = '';
         },
+        setOnlineUser: (state, action) => {
+            state.onlineUser = action.payload;
+        },
     },
 });
 
-export const { setUser, setToken, logout } = userSlice.actions;
+export const { setUser, setToken, logout, setOnlineUser } = userSlice.actions;
 
 export default userSlice.reducer;

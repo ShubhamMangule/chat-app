@@ -4,8 +4,9 @@ require('dotenv').config();
 const connectDB = require('./config/connectDB');
 const router = require('./routers//index');
 const cookieParser = require('cookie-parser');
+const { app, server } = require('./socket/index');
 
-const app = express();
+// const app = express();
 app.use(
     cors({
         origin: process.env.FRONTEND_URL,
@@ -26,7 +27,10 @@ app.get('/', (req, res) => {
 app.use('/api', router);
 
 connectDB().then(() => {
-    app.listen(PORT, () => {
-        console.log('Server running on', PORT);
+    // app.listen(PORT, () => {
+    //     console.log('Server running on', PORT);
+    // });
+    server.listen(PORT, () => {
+        console.log('Server running on ', PORT);
     });
 });

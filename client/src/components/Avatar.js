@@ -1,7 +1,10 @@
 import React from 'react';
 import { FaUser } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 
 function Avatar({ userId, name, imageUrl, width, height }) {
+    const onlineUser = useSelector((state) => state?.user?.onlineUser);
+
     let avatarName = '';
     if (name) {
         const splitName = name?.split(' ');
@@ -27,9 +30,11 @@ function Avatar({ userId, name, imageUrl, width, height }) {
 
     const randomNumber = Math.floor(Math.random() * 10);
 
+    const isOnline = onlineUser.includes(userId);
+
     return (
         <div
-            className={`text-slate-800 overflow-hidden rounded-full border font-bold ${bgColor[randomNumber]}`}
+            className={`text-slate-800 rounded-full border font-bold relative ${bgColor[randomNumber]}`}
             style={{ width: width + 'px', height: height + 'px' }}
         >
             {imageUrl ? (
@@ -49,6 +54,9 @@ function Avatar({ userId, name, imageUrl, width, height }) {
                 </div>
             ) : (
                 <FaUser size={width} />
+            )}
+            {isOnline && (
+                <div className='bg-green-500 p-1 absolute bottom-2 right-0 z-10 rounded-full'></div>
             )}
         </div>
     );

@@ -2,8 +2,10 @@ import axios from 'axios';
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { logout, setUser } from '../redux/userSlice';
+import { logout, setOnlineUser, setUser } from '../redux/userSlice';
 import Sidebar from '../components/Sidebar';
+import logo from '../assets/shridha_logo.png';
+import io from 'socket.io-client';
 
 const Home = () => {
     const user = useSelector((state) => state.user);
@@ -32,16 +34,49 @@ const Home = () => {
         fetchUserDetails();
     }, []);
 
+    // socket connection
+    useEffect(() => {
+        const socketConnection = io(process.env.REACT_APP_BACKEND_URL, {
+            auth: {
+                token: localStorage.getItem('token'),
+            },
+        });
+
+        socketConnection.on('onlineUser', (data) => {
+            console.log(data);
+            dispatch(setOnlineUser(data));
+        });
+
+        return () => {
+            socketConnection.disconnect();
+        };
+    }, []);
+
     const basePath = location.pathname === '/';
 
     return (
-        <div className='grid lg:grid-cols-[300px,1fr] h-screen max-h-screen'>
-            <section className='bg-red-800'>
+        <div className='grid lg:grid-cols-[300px,1fr] bg-gray-600 h-screen max-h-screen'>
+            {/* <div className='grid lg:grid-cols-[300px,1fr] h-screen max-h-screen'> */}
+            <section className={`bg-black ${!basePath && 'hidden'} lg:block`}>
+                {/* <section className={`bg-white ${!basePath && 'hidden'} lg:block`}> */}
                 <Sidebar />
             </section>
-            <section className={``}>
+            <section className={`${basePath && 'hidden'}`}>
                 <Outlet />
             </section>
+
+            <div
+                className={`justify-center items-center flex-col gap-2 hidden ${
+                    !basePath ? 'hidden' : 'lg:flex'
+                }`}
+            >
+                <div>
+                    <img src={logo} alt='' width={80} />
+                </div>
+                <p className='text-lg mt-2 text-slate-500'>
+                    Select user to send message
+                </p>
+            </div>
         </div>
     );
 };
