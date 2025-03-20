@@ -9,6 +9,9 @@ import { FaImage } from 'react-icons/fa';
 import { FaVideo } from 'react-icons/fa6';
 import uploadFile from '../helper/uploadFile';
 import { IoMdClose } from 'react-icons/io';
+import { Loading } from './Loading';
+import bgImg from '../assets/wallapaper.jpeg';
+import { IoSend } from 'react-icons/io5';
 
 const MessagePage = () => {
     const params = useParams();
@@ -24,6 +27,7 @@ const MessagePage = () => {
         online: false,
     });
     const [openImgVideoUpload, setOpenImgVideoUpload] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState({
         text: '',
         imageUrl: '',
@@ -48,7 +52,10 @@ const MessagePage = () => {
 
     const handleUploadImage = async (e) => {
         const file = e.target.files[0];
+        setLoading(true);
         const upload = await uploadFile(file);
+        setLoading(false);
+        setOpenImgVideoUpload(false);
         setMessage((pd) => {
             return { ...pd, imageUrl: upload?.url };
         });
@@ -62,7 +69,10 @@ const MessagePage = () => {
 
     const handleUploadVideo = async (e) => {
         const file = e.target.files[0];
+        setLoading(true);
         const upload = await uploadFile(file);
+        setLoading(false);
+        setOpenImgVideoUpload(false);
         setMessage((pd) => {
             return { ...pd, videoUrl: upload?.url };
         });
@@ -73,8 +83,22 @@ const MessagePage = () => {
             return { ...pd, videoUrl: '' };
         });
     };
+
+    const handleOnchage = (e) => {
+        const { name, value } = e.target;
+        setMessage((pd) => {
+            return {
+                ...pd,
+                text: value,
+            };
+        });
+    };
+
     return (
-        <div>
+        <div
+            style={{ backgroundImage: `url(${bgImg})` }}
+            className='bg-no-repeat bg-cover'
+        >
             <header className='sticky top-0 h-16 bg-white flex justify-between items-center px-4'>
                 <div className='flex items-center gap-4'>
                     <Link to={'/'} className='lg:hidden'>
@@ -111,7 +135,7 @@ const MessagePage = () => {
             </header>
 
             {/* show all msg */}
-            <section className='h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative'>
+            <section className='h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-55'>
                 {/* Image */}
                 {message?.imageUrl && (
                     <div className='w-full h-full bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
@@ -142,12 +166,17 @@ const MessagePage = () => {
                         <div className='bg-white p-3'>
                             <video
                                 src={message?.videoUrl}
-                                className='aspect-video w-full h-full max-w-sm m-2'
+                                className='aspect-square w-full h-full max-w-sm m-2'
                                 controls
                                 muted
                                 autoPlay
                             />
                         </div>
+                    </div>
+                )}
+                {loading && (
+                    <div className='flex w-full h-full justify-center items-center'>
+                        <Loading />
                     </div>
                 )}
             </section>
@@ -188,16 +217,32 @@ const MessagePage = () => {
                                     type='file'
                                     id='uploadImage'
                                     onChange={handleUploadImage}
+                                    className='hidden'
                                 />
                                 <input
                                     type='file'
                                     id='uploadVideo'
                                     onChange={handleUploadVideo}
+                                    className='hidden'
                                 />
                             </form>
                         </div>
                     )}
                 </div>
+
+                {/* input box */}
+                <form className='h-full w-full flex'>
+                    <input
+                        type='text'
+                        className='py-1 px-4 outline-none w-full h-full'
+                        placeholder='Type here msg...'
+                        value={message?.text}
+                        onChange={handleOnchage}
+                    />
+                    <button className='text-primary'>
+                        <IoSend size={28} />
+                    </button>
+                </form>
             </section>
         </div>
     );
