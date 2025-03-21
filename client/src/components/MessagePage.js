@@ -12,6 +12,7 @@ import { IoMdClose } from 'react-icons/io';
 import { Loading } from './Loading';
 import bgImg from '../assets/wallapaper.jpeg';
 import { IoSend } from 'react-icons/io5';
+import moment from 'moment';
 
 const MessagePage = () => {
     const params = useParams();
@@ -28,6 +29,7 @@ const MessagePage = () => {
     });
     const [openImgVideoUpload, setOpenImgVideoUpload] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [allMessage, setAllMessage] = useState([]);
     const [message, setMessage] = useState({
         text: '',
         imageUrl: '',
@@ -44,8 +46,11 @@ const MessagePage = () => {
             socketConnection.emit('message-page', params?.userId);
 
             socketConnection.on('message-user', (data) => {
-                // console.log('data', data);
                 setDataUser(data);
+            });
+            socketConnection.on('message', (data) => {
+                setAllMessage(data);
+                // console.log('data', data);
             });
         }
     }, [socketConnection, params?.userId, user]);
@@ -92,6 +97,27 @@ const MessagePage = () => {
                 text: value,
             };
         });
+    };
+
+    const handleSendMessage = (e) => {
+        e.preventDefault();
+        if (message?.text || message?.imageUrl || message?.videoUrl) {
+            if (socketConnection) {
+                socketConnection?.emit('new message', {
+                    sender: user?._id,
+                    receiver: params?.userId,
+                    text: message?.text,
+                    imageUrl: message?.imageUrl,
+                    videoUrl: message?.videoUrl,
+                    msgByUserId: user?._id,
+                });
+                setMessage({
+                    text: '',
+                    imageUrl: '',
+                    videoUrl: '',
+                });
+            }
+        }
     };
 
     return (
@@ -179,6 +205,27 @@ const MessagePage = () => {
                         <Loading />
                     </div>
                 )}
+
+                {/* show all msg here */}
+                <div className='flex flex-col gap-2 '>
+                    {allMessage?.map((msg, index) => (
+                        <div
+                            key={index}
+                            className='bg-white p-1 py-1 rounded w-fit'
+                        >
+                            <p className='px-2'>{msg?.text}</p>
+                            <p
+                                className={`text-xs ml-auto w-fit ${
+                                    user?._id === msg?.msgByUserId
+                                        ? 'ml-auto'
+                                        : ''
+                                }`}
+                            >
+                                {moment(msg?.createdAt).format('hh:mm')}
+                            </p>
+                        </div>
+                    ))}
+                </div>
             </section>
 
             {/* send msg */}
@@ -231,7 +278,10 @@ const MessagePage = () => {
                 </div>
 
                 {/* input box */}
-                <form className='h-full w-full flex'>
+                <form
+                    className='h-full w-full flex'
+                    onSubmit={handleSendMessage}
+                >
                     <input
                         type='text'
                         className='py-1 px-4 outline-none w-full h-full'
@@ -239,7 +289,7 @@ const MessagePage = () => {
                         value={message?.text}
                         onChange={handleOnchage}
                     />
-                    <button className='text-primary'>
+                    <button className='text-primary hover:text-secondary'>
                         <IoSend size={28} />
                     </button>
                 </form>
