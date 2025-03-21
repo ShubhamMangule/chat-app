@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link, useParams } from 'react-router-dom';
 import Avatar from './Avatar';
@@ -30,6 +30,17 @@ const MessagePage = () => {
     const [openImgVideoUpload, setOpenImgVideoUpload] = useState(false);
     const [loading, setLoading] = useState(false);
     const [allMessage, setAllMessage] = useState([]);
+    const currentMessage = useRef(null);
+
+    useEffect(() => {
+        if (currentMessage.current) {
+            currentMessage.current.scrollIntoView({
+                behavior: 'smooth',
+                block: 'end',
+            });
+        }
+    }, [allMessage]);
+
     const [message, setMessage] = useState({
         text: '',
         imageUrl: '',
@@ -162,9 +173,51 @@ const MessagePage = () => {
 
             {/* show all msg */}
             <section className='h-[calc(100vh-128px)] overflow-x-hidden overflow-y-scroll scrollbar relative bg-slate-200 bg-opacity-55'>
+                {/* show all msg here */}
+                <div
+                    className='flex flex-col gap-2 py-2 mx-2'
+                    ref={currentMessage}
+                >
+                    {allMessage?.map((msg, index) => (
+                        <div
+                            key={index}
+                            className={`bg-white p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${
+                                user?._id === msg?.msgByUserId
+                                    ? 'ml-auto bg-teal-100'
+                                    : 'mr-auto'
+                            }`}
+                        >
+                            <div className='w-full'>
+                                {msg?.imageUrl && (
+                                    <img
+                                        src={msg?.imageUrl}
+                                        alt=''
+                                        className='w-full h-full object-scale-down'
+                                    />
+                                )}
+                            </div>
+                            <div className='w-full'>
+                                {msg?.videoUrl && (
+                                    <video
+                                        src={msg?.videoUrl}
+                                        alt=''
+                                        className='w-full h-full object-scale-down'
+                                        controls
+                                        muted
+                                    />
+                                )}
+                            </div>
+                            <p className='px-2'>{msg?.text}</p>
+                            <p className='text-xs ml-auto w-fit'>
+                                {moment(msg?.createdAt).format('hh:mm')}
+                            </p>
+                        </div>
+                    ))}
+                </div>
+
                 {/* Image */}
                 {message?.imageUrl && (
-                    <div className='w-full h-full bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
+                    <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
                         <div
                             className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600'
                             onClick={handleClearUploadImage}
@@ -182,7 +235,7 @@ const MessagePage = () => {
                 )}
                 {/* video */}
                 {message?.videoUrl && (
-                    <div className='w-full h-full bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
+                    <div className='w-full h-full sticky bottom-0 bg-slate-700 bg-opacity-30 flex justify-center items-center rounded overflow-hidden'>
                         <div
                             className='w-fit p-2 absolute top-0 right-0 cursor-pointer hover:text-red-600'
                             onClick={handleClearUploadVideo}
@@ -201,31 +254,10 @@ const MessagePage = () => {
                     </div>
                 )}
                 {loading && (
-                    <div className='flex w-full h-full justify-center items-center'>
+                    <div className='flex w-full h-full sticky bottom-0 justify-center items-center'>
                         <Loading />
                     </div>
                 )}
-
-                {/* show all msg here */}
-                <div className='flex flex-col gap-2 '>
-                    {allMessage?.map((msg, index) => (
-                        <div
-                            key={index}
-                            className='bg-white p-1 py-1 rounded w-fit'
-                        >
-                            <p className='px-2'>{msg?.text}</p>
-                            <p
-                                className={`text-xs ml-auto w-fit ${
-                                    user?._id === msg?.msgByUserId
-                                        ? 'ml-auto'
-                                        : ''
-                                }`}
-                            >
-                                {moment(msg?.createdAt).format('hh:mm')}
-                            </p>
-                        </div>
-                    ))}
-                </div>
             </section>
 
             {/* send msg */}
