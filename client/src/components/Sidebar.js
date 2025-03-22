@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaUserPlus } from 'react-icons/fa';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { CiLogout } from 'react-icons/ci';
@@ -15,6 +15,39 @@ function Sidebar() {
     const [editUserOpen, setEditUserOpen] = useState(false);
     const [allUser, setAllUser] = useState([]);
     const [openSearchUser, setOpenSearchUser] = useState(false);
+    const socketConnection = useSelector(
+        (state) => state?.user?.socketConnection,
+    );
+
+    useEffect(() => {
+        if (socketConnection) {
+            socketConnection.emit('sidebar', user?._id);
+
+            socketConnection.on('conversation', (data) => {
+                // console.log('data', data);
+
+                const conversationUserData = data?.map((convUser, index) => {
+                    if (convUser?.sender?._id === convUser?.receiver?._id) {
+                        return {
+                            ...convUser,
+                            userDetails: convUser?.sender,
+                        };
+                    } else if (convUser?.receiver?._id !== user?._d) {
+                        return {
+                            ...convUser,
+                            userDetails: convUser?.receiver,
+                        };
+                    } else {
+                        return {
+                            ...convUser,
+                            userDetails: convUser?.sender,
+                        };
+                    }
+                });
+                setAllUser(conversationUserData);
+            });
+        }
+    }, [socketConnection, user]);
 
     return (
         <div className='w-full h-full grid grid-cols-[48px,1fr] bg-white'>
@@ -81,6 +114,24 @@ function Sidebar() {
                             </p>
                         </div>
                     )}
+
+                    {allUser?.map((conv, ind) => {
+                        return (
+                            <div key={conv?._id}>
+                                <div>
+                                    <Avatar
+                                        width={36}
+                                        height={36}
+                                        name={conv?.userDetails?.name}
+                                        imageUrl={
+                                            conv?.userDetails?.profile_pic
+                                        }
+                                        userId={user?._id}
+                                    />
+                                </div>
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
 

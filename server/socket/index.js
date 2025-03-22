@@ -49,6 +49,18 @@ io.on('connection', async (socket) => {
             online: onlineUser.has(userId),
         };
         socket.emit('message-user', payload);
+
+        // get previous msg
+        const getConvesationMessage = await ConversationModel.findOne({
+            $or: [
+                { sender: user?._id, receiver: userId },
+                { sender: userId, receiver: user?._id },
+            ],
+        })
+            .populate('messages')
+            .sort({ updatedAt: -1 });
+
+        socket.emit('message', getConvesationMessage?.messages);
     });
 
     // new msg
@@ -100,6 +112,40 @@ io.on('connection', async (socket) => {
         io.to(data?.receiver).emit('message', getConvesationMessage.messages);
     });
 
+    // sidebar
+    socket.on('sidebar', async (currentUserId) => {
+        // console.log('currentUserId', currentUserId);
+        const currentUserConversation = await ConversationModel.find({
+            $or: [
+                { sender: currentUserId },
+                {
+                    receiver: currentUserId,
+                },
+            ],
+        })
+            .sort({ updatedAt: -1 })
+            .populate('messages')
+            .populate('sender')
+            .populate('receiver');
+
+        const conversation = currentUserConversation?.map((data) => {
+            const countUnseenMsg = data?.messages.reduce(
+                (prev, curr) => prev + (curr?.seen ? 0 : 1),
+                0,
+            );
+            return {
+                _id: data?._id,
+                sender: data?.sender,
+                receiver: data?.receiver,
+                unSeenMsg: countUnseenMsg,
+                lastMsg: data?.messages[data?.messages?.length - 1],
+            };
+        });
+
+        socket.emit('conversation', conversation);
+    });
+
+    // disconnect
     socket.on('disconnect', () => {
         onlineUser.delete(user?._id);
         console.log('User disconnected', socket.id);

@@ -183,8 +183,8 @@ const MessagePage = () => {
                             key={index}
                             className={`bg-white p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${
                                 user?._id === msg?.msgByUserId
-                                    ? 'ml-auto bg-teal-100'
-                                    : 'mr-auto'
+                                    ? 'ml-auto bg-green-600'
+                                    : 'mr-auto bg-black'
                             }`}
                         >
                             <div className='w-full'>
@@ -195,8 +195,6 @@ const MessagePage = () => {
                                         className='w-full h-full object-scale-down'
                                     />
                                 )}
-                            </div>
-                            <div className='w-full'>
                                 {msg?.videoUrl && (
                                     <video
                                         src={msg?.videoUrl}
