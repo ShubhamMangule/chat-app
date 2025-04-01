@@ -1,5 +1,6 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from 'react';
-import { FaUserPlus } from 'react-icons/fa';
+import { FaUserPlus, FaVideo } from 'react-icons/fa';
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5';
 import { CiLogout } from 'react-icons/ci';
 import { NavLink } from 'react-router-dom';
@@ -8,6 +9,8 @@ import { useSelector } from 'react-redux';
 import EditUserDetails from './EditUserDetails';
 import { FiArrowUpLeft } from 'react-icons/fi';
 import { SearchUser } from './SearchUser';
+import { FaPlus } from 'react-icons/fa';
+import { FaImage } from 'react-icons/fa';
 // import { EditUserDetails } from './EditUserDetails';
 
 function Sidebar() {
@@ -19,9 +22,10 @@ function Sidebar() {
         (state) => state?.user?.socketConnection,
     );
 
+    // console.log('user?._id', user?._id);
     useEffect(() => {
         if (socketConnection) {
-            socketConnection.emit('sidebar', user?._id);
+            if (user?._id) socketConnection.emit('sidebar', user?._id);
 
             socketConnection.on('conversation', (data) => {
                 // console.log('data', data);
@@ -117,11 +121,14 @@ function Sidebar() {
 
                     {allUser?.map((conv, ind) => {
                         return (
-                            <div key={conv?._id}>
+                            <div
+                                key={conv?._id}
+                                className='flex items-center gap-2 py-3 px-2 border border-transparent hover:border-primary rounded hover:bg-slate-100 cursor-pointer '
+                            >
                                 <div>
                                     <Avatar
-                                        width={36}
-                                        height={36}
+                                        width={40}
+                                        height={40}
                                         name={conv?.userDetails?.name}
                                         imageUrl={
                                             conv?.userDetails?.profile_pic
@@ -129,6 +136,39 @@ function Sidebar() {
                                         userId={user?._id}
                                     />
                                 </div>
+                                <div>
+                                    <h3 className='text-ellipsis line-clamp-1 font-semibold text-base'>
+                                        {conv?.userDetails?.name}
+                                    </h3>
+                                    <div className='text-slate-500 text-xm'>
+                                        <div className='flex items-center gap-1'>
+                                            {conv?.lastMsg?.imageUrl && (
+                                                <div className='flex items-center gap-1'>
+                                                    <span>
+                                                        <FaImage />
+                                                    </span>
+                                                    {!conv?.lastMsg?.text && (
+                                                        <span>Image</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            {conv?.lastMsg?.videoUrl && (
+                                                <div className='flex items-center gap-1'>
+                                                    <span>
+                                                        <FaVideo />
+                                                    </span>
+                                                    {!conv?.lastMsg?.text && (
+                                                        <span>Video</span>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <p>{conv?.lastMsg?.text}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <p className='text-sm w-6 h-6 flex  justify-center items-center  ml-auto p-1 bg-primary text-white font-semibold rounded-full '>
+                                    {conv?.unSeenMsg}
+                                </p>
                             </div>
                         );
                     })}
